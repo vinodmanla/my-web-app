@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+
+    environment {
+        EC2_HOST = 'ec2-user@<EC2-PUBLIC-IP>'
+        APP_REPO = 'https://github.com/yourusername/yourrepo.git'
+        ANSIBLE_INVENTORY = 'hosts'
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git url: "${APP_REPO}", branch: 'main'
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                sh '''
+                echo "Running tests..."
+                chmod +x test.sh
+                ./test.sh
+                '''
+            }
+        }
+
+        stage('Deploy to EC2 using Ansible') {
+            steps {
+                sh '''
+                ansible-playbook -i ${ANSIBLE_INVENTORY} deploy.yml
+                '''
+            }
+        }
+    }
+
+    post {
+        failure {
+            echo 'Build failed! Check errors.'
+        }
+        success {
+            echo 'Deployed Successfully!'
+        }
+    }
+}
+

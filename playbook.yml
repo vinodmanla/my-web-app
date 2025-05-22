@@ -1,0 +1,15 @@
+- name: Deploy app to EC2
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Ensure Apache is installed
+      apt:
+        name: apache2
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Copy app files
+      copy:
+        src: ./app/
+        dest: /var/www/html/
+
