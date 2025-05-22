@@ -1,0 +1,8 @@
+- hosts: webserver
+  become: yes
+  tasks:
+    - name: Copy app files
+      copy:
+        src: ./app/
+        dest: /var/www/html/
+
